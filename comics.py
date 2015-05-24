@@ -1,5 +1,5 @@
 # -*- coding: cp1252 -*-
-import urllib2, cookielib
+import urllib2, cookielib, urllib
 from html.parser import HTMLParser
 
 class MyParse(HTMLParser):
@@ -9,6 +9,8 @@ class MyParse(HTMLParser):
             if "http://s3.roosterteeth.com/assets/media/9_4" in imageURL:
                 imageURL = imageURL.replace("t.jpg", ".jpg")
                 print imageURL
+                filename = imageURL.split("9_4")[1]
+                urllib.urlretrieve(imageURL, "comics/"+filename)
 
 hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -17,15 +19,18 @@ hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML,
        'Accept-Language': 'en-US,en;q=0.8',
        'Connection': 'keep-alive'}
 
-site= "http://roosterteeth.com/comics/?page=2"
+i = 84
 
-req = urllib2.Request(site, headers=hdr)
+while(i > 0):
+    site = "http://roosterteeth.com/comics/?page="+str(i)
+    req = urllib2.Request(site, headers=hdr)
 
-try:
-    page = urllib2.urlopen(req)
-except urllib2.HTTPError, e:
-    print e.fp.read()
+    try:
+        page = urllib2.urlopen(req)
+    except urllib2.HTTPError, e:
+        print e.fp.read()
 
-h = MyParse()
-content = page.read()
-h.feed(content)
+    h = MyParse()
+    content = page.read()
+    h.feed(content)
+    i = i - 1
